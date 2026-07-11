@@ -44,7 +44,7 @@ Compared with the starter logic, I added more musical features, created weighted
 
 ## 4. Data
 
-The current dataset contains **20 songs**.
+The current dataset contains **30 songs**.
 
 The catalog includes several genres, such as:
 
