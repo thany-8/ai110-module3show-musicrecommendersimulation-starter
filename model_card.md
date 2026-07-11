@@ -2,8 +2,9 @@
 
 ## 1. Model Name  
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+**VibeFlow 1.0** 
+
+**
 
 ---
 
@@ -12,6 +13,8 @@ Example: **VibeFinder 1.0**
 Describe what your recommender is designed to do and who it is for. 
 
 Prompts:  
+
+This app is disigne for any from young adult, where they can find they music acording of their vibe, 
 
 - What kind of recommendations does it generate  
 - What assumptions does it make about the user  
@@ -109,3 +112,19 @@ Prompts:
 - What you learned about recommender systems  
 - Something unexpected or interesting you discovered  
 - How this changed the way you think about music recommendation apps  
+zz
+
+
+
+┌──────────────┬──────┬───────────┬────────┬────────────────────────────────────────────┐
+│ feature      │ std  │ range     │ scale  │ verdict                                    │
+├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
+│ acousticness │ 0.31 │ 0.01–0.93 │ 0–1    │ widest spread, most discriminating         │
+├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
+│ energy       │ 0.22 │ 0.28–0.93 │ 0–1    │ strong spread ✅                           │
+├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
+│ valence      │ 0.21 │ 0.12–0.96 │ 0–1    │ strong spread + most independent ✅        │
+├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
+│ tempo_bpm    │ 25.8 │ 60–171    │ 60–171 │ good spread but off-scale → must normalize │
+├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
+│ danceability │ 0.14 │ 0.35–0.88 │ 0–1    │ narrowest, clustered high → weak           │

@@ -15,19 +15,109 @@ Replace this paragraph with your own summary of what your version does.
 
 ---
 
-## How The System Works
+## ## How the System Works
 
-Explain your design in plain language.
+This project recommends songs by comparing each song’s musical features with the user’s preferences.
 
-Some prompts to answer:
+### 1. Song Features
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+Each `Song` contains information that describes how it sounds:
 
-You can include a simple diagram or bullet list if helpful.
+* **Genre:** The song’s musical category, such as pop, rock, reggaeton, or salsa.
+* **Mood:** The main feeling of the song, such as happy, sad, relaxed, romantic, or energetic.
+* **Energy:** How intense or active the song sounds, measured from `0.0` to `1.0`.
+* **Tempo:** The speed of the song in beats per minute (`BPM`).
+* **Valence:** How positive or cheerful the song sounds, measured from `0.0` to `1.0`.
+* **Danceability:** How suitable the song is for dancing, measured from `0.0` to `1.0`.
+* **Acousticness:** How acoustic the song sounds, measured from `0.0` to `1.0`.
+
+For example, a song with high energy, high valence, and high danceability may be a good choice for a party or workout playlist.
+
+### 2. User Profile
+
+The `UserProfile` stores the user’s musical preferences.
+
+It can include:
+
+* Preferred genre
+* Preferred mood
+* Preferred energy level
+* Preferred tempo
+* Preferred valence
+* Preferred danceability
+* Preferred acousticness
+* Songs the user has already liked
+
+For example, a user may prefer:
+
+```text
+Genre: Pop
+Mood: Happy
+Energy: 0.80
+Tempo: 120 BPM
+Valence: 0.90
+Danceability: 0.85
+Acousticness: 0.20
+```
+
+### 3. Recommendation Score
+
+The `Recommender` compares the user’s preferences with every song in the dataset.
+
+For categorical features such as `genre` and `mood`, the song receives points when its value matches the user’s preference.
+
+For numerical features such as `energy`, `tempo`, and `danceability`, the system calculates how close the song’s value is to the user’s preferred value. A smaller difference produces a higher score.
+
+A simplified scoring system may look like this:
+
+```text
+Genre match          = 2 points
+Mood match           = 2 points
+Similar energy       = up to 1 point
+Similar tempo        = up to 1 point
+Similar valence      = up to 1 point
+Similar danceability = up to 1 point
+Similar acousticness = up to 1 point
+```
+
+Genre and mood receive more weight because they have a strong influence on the type of music the user wants to hear.
+
+### 4. Selecting Recommendations
+
+After calculating a score for every song, the system:
+
+1. Calculates the similarity score for each song.
+2. Sorts the songs from the highest score to the lowest score.
+3. Removes songs the user has already heard or selected, when necessary.
+4. Returns the top-scoring songs as recommendations.
+
+For example, when the user requests happy, energetic, and danceable music, songs with high valence, energy, and danceability will receive better scores.
+
+### System Flow
+
+```text
+Song CSV Dataset
+       |
+       v
+Load Song Features
+       |
+       v
+Read User Preferences
+       |
+       v
+Compare Each Song With the UserProfile
+       |
+       v
+Calculate a Recommendation Score
+       |
+       v
+Sort Songs by Score
+       |
+       v
+Return the Top Recommendations
+```
+
+This is a **content-based recommendation system** because it recommends songs based on their musical characteristics and how closely those characteristics match the user’s preferences.
 
 ---
 
