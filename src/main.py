@@ -24,7 +24,7 @@ def main() -> None:
     user_prefs = {
         "favorite_genre": "pop",      # matched exactly or by family (pop-family = 17/30 songs)
         "favorite_mood": "happy",     # used for mood match + explanations
-        "target_energy": 0.8,         # closeness-scored on a 0-1 scale
+        "target_energy": 0.80,         # closeness-scored on a 0-1 scale
         "target_valence": 0.85,       # "happy" songs average ~0.86 valence in this catalog
         "likes_acoustic": False,      # maps to acousticness (low weight; ~-0.87 corr. with energy)
     }

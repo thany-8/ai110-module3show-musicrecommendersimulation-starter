@@ -1,130 +1,200 @@
 # 🎧 Model Card: Music Recommender Simulation
 
-## 1. Model Name  
+## 1. Model Name
 
-**VibeFlow 1.0** 
+**VibeFlow 1.0**
 
-**
-
----
-
-## 2. Intended Use  
-
-Describe what your recommender is designed to do and who it is for. 
-
-Prompts:  
-
-This app is disigne for any from young adult, where they can find they music acording of their vibe, 
-
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+VibeFlow is a small music recommendation system that suggests songs based on a user’s preferred vibe, mood, genre, and musical characteristics.
 
 ---
 
-## 3. How the Model Works  
+## 2. Intended Use
 
-Explain your scoring approach in simple language.  
+VibeFlow is designed mainly for young adults and other listeners who want to discover songs that match their current mood or preferred musical style.
 
-Prompts:  
+The system generates song recommendations by comparing the user’s taste profile with the features of each song in the catalog. It assumes that the user’s preferences can be represented through features such as favorite genre, preferred mood, energy, tempo, valence, danceability, and acousticness.
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
-
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+This project is intended for classroom exploration and learning. It is not a production-level recommendation system and should not be treated as a replacement for real-world platforms such as Spotify, Apple Music, or YouTube Music.
 
 ---
 
-## 4. Data  
+## 3. How the Model Works
 
-Describe the dataset the model uses.  
+VibeFlow uses a content-based recommendation approach.
 
-Prompts:  
+Each song is described using the following features:
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+- Genre
+- Mood
+- Energy
+- Tempo
+- Valence
+- Danceability
+- Acousticness
 
----
+The user profile stores preferred genres and moods, along with target values for the numerical features.
 
-## 5. Strengths  
+The recommender compares every song with the user profile and calculates a score. Songs receive more points when their genre or mood matches the user’s preferences. They also receive similarity points when their energy, tempo, valence, danceability, and acousticness are close to the user’s target values.
 
-Where does your system seem to work well  
+After every song is scored, the system sorts the songs from the highest score to the lowest score and returns the top recommendations.
 
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
-
----
-
-## 6. Limitations and Bias 
-
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
+Compared with the starter logic, I added more musical features, created weighted scoring rules, included support for related genre families, and added written explanations that show why each song was recommended.
 
 ---
 
-## 7. Evaluation  
+## 4. Data
 
-How you checked whether the recommender behaved as expected. 
+The current dataset contains **20 songs**.
 
-Prompts:  
+The catalog includes several genres, such as:
 
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
+- Pop
+- Reggaeton
+- Salsa
+- Dance-pop
+- Alternative pop
+- Indie pop
+- Hip-hop
+- Afrobeats
+- Latin pop
+- Rock-related styles
 
-No need for numeric metrics unless you created some.
+The dataset also includes moods such as:
+
+- Happy
+- Sad
+- Relaxed
+- Romantic
+- Energetic
+- Confident
+- Emotional
+- Playful
+- Dark
+
+
+I added and organized song data manually in a CSV file. Each song includes categorical and numerical features.
+
+Because the dataset is small, many musical styles are missing or underrepresented. The catalog does not fully represent classical music, jazz, country, regional music, experimental music, or many international genres.
+
+The numerical features also have different levels of variation:
+
+| Feature | Standard deviation | Range | Interpretation |
+|---|---:|---:|---|
+| Acousticness | 0.31 | 0.01–0.93 | Widest spread and most useful for separating songs |
+| Energy | 0.22 | 0.28–0.93 | Strong variation across the catalog |
+| Valence | 0.21 | 0.12–0.96 | Strong variation and useful for mood differences |
+| Tempo | 25.8 | 60–171 BPM | Good variation, but it must be normalized |
+| Danceability | 0.14 | 0.35–0.88 | Narrower range, so it may have less influence |
+
+Acousticness appears to be the most discriminating feature in the current dataset. Danceability is more clustered, so it may not separate songs as strongly.
 
 ---
 
-## 8. Future Work  
+## 5. Strengths
 
-Ideas for how you would improve the model next.  
+VibeFlow works best for users whose preferences are clearly represented in the dataset.
 
-Prompts:  
+For example, it performs reasonably well for users who prefer:
 
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
+- Happy pop songs
+- Energetic reggaeton
+- Relaxed acoustic music
+- Danceable music with high valence
+- Calm songs with low energy
+
+The scoring system captures several useful patterns. It can distinguish between songs that belong to the same genre but have different energy, tempo, or acousticness.
+
+The recommendations often match intuition when a song matches both the user’s preferred genre and mood while also being close to the user’s numerical targets.
+
+For example, `Sunrise City` ranked first for a happy pop profile because it matched the preferred genre and mood and was also close to the user’s targets for energy, positivity, tempo, danceability, and acousticness.
+
+Another strength is that the system provides an explanation for each recommendation. This makes the result easier to understand instead of only showing a score.
 
 ---
 
-## 9. Personal Reflection  
+## 6. Limitations and Bias
 
-A few sentences about your experience.  
+VibeFlow has several limitations:
 
-Prompts:  
+- The dataset contains a small number of songs.
+- Song features were manually labeled and may be subjective.
+- Mood and genre do not always have one correct label.
+- The system may over-prioritize genre because genre receives a large weight.
+- It may ignore good songs from unfamiliar genres even when their mood and numerical features match the user.
+- A single user profile cannot represent every listening situation.
+- A user may prefer different music while studying, exercising, relaxing, driving, or attending a party.
+- The system does not analyze lyrics or language.
+- It does not learn from likes, skips, repeated plays, ratings, or listening history.
+- Songs with missing or inaccurate feature values may receive unfair scores.
+- The recommender may repeatedly suggest similar songs and reduce musical variety.
+- Some genres and moods are underrepresented in the dataset.
+- Related genre families are manually defined, which may introduce additional bias.
+- Danceability has a narrower range in the dataset, so it may contribute less than expected.
+- Tempo uses a different scale from the other features, so incorrect normalization could affect the ranking.
 
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
-zz
+Because the system depends on manually selected features and weights, the designer’s choices directly influence the recommendations.
 
+---
 
+## 7. Evaluation
 
-┌──────────────┬──────┬───────────┬────────┬────────────────────────────────────────────┐
-│ feature      │ std  │ range     │ scale  │ verdict                                    │
-├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
-│ acousticness │ 0.31 │ 0.01–0.93 │ 0–1    │ widest spread, most discriminating         │
-├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
-│ energy       │ 0.22 │ 0.28–0.93 │ 0–1    │ strong spread ✅                           │
-├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
-│ valence      │ 0.21 │ 0.12–0.96 │ 0–1    │ strong spread + most independent ✅        │
-├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
-│ tempo_bpm    │ 25.8 │ 60–171    │ 60–171 │ good spread but off-scale → must normalize │
-├──────────────┼──────┼───────────┼────────┼────────────────────────────────────────────┤
-│ danceability │ 0.14 │ 0.35–0.88 │ 0–1    │ narrowest, clustered high → weak           │
+I evaluated the recommender by testing different user profiles and comparing the results with what I expected.
+
+I tested profiles such as:
+
+- Happy and energetic pop
+- Danceable reggaeton
+- Calm and acoustic music
+- Intense rock
+- Chill lofi-style music
+
+I looked for several things in the results:
+
+- Whether the top songs matched the preferred genre
+- Whether the mood matched the user profile
+- Whether the numerical features were close to the target values
+- Whether related genres appeared when appropriate
+- Whether the explanation matched the actual scoring logic
+
+One important test was checking whether the system could distinguish between intense rock and chill lofi. These profiles have different energy, tempo, mood, and acousticness values, so the recommender should rank them differently.
+
+I also compared the effect of changing feature weights. Increasing the genre weight produced more exact genre matches, but it reduced variety. Including mood and numerical similarity created more balanced recommendations.
+
+One surprising result was that a song from a related genre could rank highly when its mood and numerical features matched the user better than an exact genre match.
+
+The project also includes tests using `pytest` to check the main recommendation behavior.
+
+---
+
+## 8. Future Work
+
+Future versions of VibeFlow could be improved by:
+
+- Expanding the song catalog
+- Adding more genres, moods, and international music
+- Allowing users to create multiple profiles
+- Creating separate profiles for studying, exercising, relaxing, and partying
+- Learning from likes, dislikes, skips, and repeated plays
+- Adding song language and release year
+- Analyzing lyrics and themes
+- Improving genre-family relationships
+- Normalizing all numerical features more carefully
+- Adding diversity rules so the top results are not too similar
+- Preventing repeated recommendations
+- Showing a detailed score breakdown for every feature
+- Allowing users to adjust the importance of genre, mood, or energy
+- Building a visual interface with Flask or Streamlit
+- Connecting to a real music API
+- Using collaborative filtering in addition to content-based filtering
+
+A future version could combine content-based recommendations with user behavior to produce more personalized results.
+
+---
+
+## 9. Personal Reflection
+
+This project helped me understand how a recommender system turns data into predictions. I learned that each song must first be represented through features, and the user must also be represented through a taste profile. The system then compares those values, calculates scores, and ranks the songs.
+
+One interesting discovery was how much the feature weights affect the final recommendations. A small change in the genre or mood weight can change which songs appear at the top. I also learned that numerical features such as energy, valence, and acousticness can help distinguish between songs that belong to the same genre.
+
+This project changed the way I think about music recommendation apps. Before, recommendations seemed automatic and simple. Now I understand that they depend on data quality, feature selection, scoring decisions, and possible bias. Real music platforms likely use much more complex systems, but this project helped me understand the basic ideas behind them.

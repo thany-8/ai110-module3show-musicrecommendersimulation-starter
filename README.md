@@ -2,211 +2,327 @@
 
 ## Project Summary
 
-In this project you will build and explain a small music recommender system.
+This project is a small content-based music recommendation system built with Python.
 
-Your goal is to:
+The system compares songs from a CSV dataset with a predefined user taste profile. Each song receives a similarity score based on features such as genre, mood, energy, tempo, valence, danceability, and acousticness.
 
-- Represent songs and a user "taste profile" as data
-- Design a scoring rule that turns that data into recommendations
-- Evaluate what your system gets right and wrong
-- Reflect on how this mirrors real world AI recommenders
+The songs with the highest scores are returned as recommendations. The program also explains why each song was selected, making the recommendation process easier to understand.
 
-Replace this paragraph with your own summary of what your version does.
+This project demonstrates how recommendation systems transform user preferences and item features into ranked predictions.
 
 ---
 
-## ## How the System Works
+## How the System Works
 
-This project recommends songs by comparing each song’s musical features with the user’s preferences.
+The system uses a **content-based recommendation approach**.
 
-### 1. Song Features
+Instead of comparing the user with other listeners, it compares each song directly with the user's preferred musical characteristics.
 
-Each `Song` contains information that describes how it sounds:
+### Song Features
 
-* **Genre:** The song’s musical category, such as pop, rock, reggaeton, or salsa.
-* **Mood:** The main feeling of the song, such as happy, sad, relaxed, romantic, or energetic.
-* **Energy:** How intense or active the song sounds, measured from `0.0` to `1.0`.
-* **Tempo:** The speed of the song in beats per minute (`BPM`).
-* **Valence:** How positive or cheerful the song sounds, measured from `0.0` to `1.0`.
-* **Danceability:** How suitable the song is for dancing, measured from `0.0` to `1.0`.
-* **Acousticness:** How acoustic the song sounds, measured from `0.0` to `1.0`.
+Each song in `songs.csv` contains the following information:
 
-For example, a song with high energy, high valence, and high danceability may be a good choice for a party or workout playlist.
+| Feature | Description |
+|---|---|
+| `id` | Unique identifier for the song |
+| `title` | Name of the song |
+| `artist` | Name of the artist |
+| `genre` | Musical category, such as pop or reggaeton |
+| `mood` | General feeling of the song, such as happy or relaxed |
+| `energy` | How intense the song sounds, from `0.0` to `1.0` |
+| `tempo_bpm` | Speed of the song in beats per minute |
+| `valence` | How positive or cheerful the song sounds |
+| `danceability` | How suitable the song is for dancing |
+| `acousticness` | How acoustic the song sounds |
 
-### 2. User Profile
+### User Profile
 
-The `UserProfile` stores the user’s musical preferences.
+The user profile stores the listener's preferred genres, moods, and target values for the numerical features.
 
-It can include:
+Example:
 
-* Preferred genre
-* Preferred mood
-* Preferred energy level
-* Preferred tempo
-* Preferred valence
-* Preferred danceability
-* Preferred acousticness
-* Songs the user has already liked
-
-For example, a user may prefer:
-
-```text
-Genre: Pop
-Mood: Happy
-Energy: 0.80
-Tempo: 120 BPM
-Valence: 0.90
-Danceability: 0.85
-Acousticness: 0.20
+```python
+user_profile = {
+    "favorite_genres": ["pop", "reggaeton"],
+    "favorite_moods": ["happy", "energetic"],
+    "target_energy": 0.80,
+    "target_tempo_bpm": 115,
+    "target_valence": 0.85,
+    "target_danceability": 0.80,
+    "target_acousticness": 0.20
+}
 ```
 
-### 3. Recommendation Score
+This profile represents a listener who prefers happy, energetic, danceable music with low acousticness.
 
-The `Recommender` compares the user’s preferences with every song in the dataset.
+---
 
-For categorical features such as `genre` and `mood`, the song receives points when its value matches the user’s preference.
+## Algorithm Recipe
 
-For numerical features such as `energy`, `tempo`, and `danceability`, the system calculates how close the song’s value is to the user’s preferred value. A smaller difference produces a higher score.
+Each song begins with a score of `0`.
 
-A simplified scoring system may look like this:
+The recommender adds points based on how closely the song matches the user's profile.
 
-```text
-Genre match          = 2 points
-Mood match           = 2 points
-Similar energy       = up to 1 point
-Similar tempo        = up to 1 point
-Similar valence      = up to 1 point
-Similar danceability = up to 1 point
-Similar acousticness = up to 1 point
-```
-
-Genre and mood receive more weight because they have a strong influence on the type of music the user wants to hear.
-
-### 4. Selecting Recommendations
-
-After calculating a score for every song, the system:
-
-1. Calculates the similarity score for each song.
-2. Sorts the songs from the highest score to the lowest score.
-3. Removes songs the user has already heard or selected, when necessary.
-4. Returns the top-scoring songs as recommendations.
-
-For example, when the user requests happy, energetic, and danceable music, songs with high valence, energy, and danceability will receive better scores.
-
-### System Flow
+### Categorical Features
 
 ```text
-Song CSV Dataset
-       |
-       v
-Load Song Features
-       |
-       v
-Read User Preferences
-       |
-       v
-Compare Each Song With the UserProfile
-       |
-       v
-Calculate a Recommendation Score
-       |
-       v
-Sort Songs by Score
-       |
-       v
-Return the Top Recommendations
+Genre match = 2.0 points
+Mood match  = 2.0 points
 ```
 
-This is a **content-based recommendation system** because it recommends songs based on their musical characteristics and how closely those characteristics match the user’s preferences.
+Genre and mood receive higher weights because they strongly influence the type of music the listener expects.
+
+The system may also award partial credit when a genre belongs to a related genre family. For example, `indie pop` may be considered related to `pop`.
+
+### Numerical Features
+
+The recommender compares these numerical features:
+
+- Energy
+- Tempo
+- Valence
+- Danceability
+- Acousticness
+
+For features measured from `0.0` to `1.0`, similarity is based on the absolute difference between the song value and the user's target.
+
+```text
+similarity = 1 - absolute difference
+```
+
+Example:
+
+```text
+User target energy = 0.80
+Song energy        = 0.70
+
+Difference         = |0.80 - 0.70| = 0.10
+Energy similarity  = 1 - 0.10 = 0.90
+```
+
+A smaller difference produces a higher similarity score.
+
+Tempo is normalized separately because it is measured in beats per minute instead of on a `0.0` to `1.0` scale.
+
+### Final Ranking
+
+After scoring every song, the system:
+
+1. Calculates a score for each song.
+2. Stores the reasons that contributed to the score.
+3. Sorts the songs from highest score to lowest score.
+4. Selects the top `k` songs.
+5. Displays the song title, score, and explanation.
+
+---
+
+## System Flow
+
+```text
+songs.csv
+    |
+    v
+Load song data
+    |
+    v
+Read the user profile
+    |
+    v
+Compare each song with the user's preferences
+    |
+    v
+Calculate similarity scores
+    |
+    v
+Sort songs from highest to lowest score
+    |
+    v
+Return the top recommendations with explanations
+```
+
+---
+
+## Project Structure
+
+```text
+AI_ENGINEEER PROJECT #3/
+├── data/
+├── src/
+│   ├── __init__.py
+│   ├── main.py
+│   ├── recommender.py
+│   └── user_profile.py
+├── tests/
+├── .gitignore
+├── ai_interactions.md
+├── model_card.md
+├── README.md
+└── requirements.txt
+```
 
 ---
 
 ## Getting Started
 
-### Setup
+### 1. Clone the Repository
 
-1. Create a virtual environment (optional but recommended):
+```bash
+git clone YOUR_REPOSITORY_URL
+cd YOUR_PROJECT_FOLDER
+```
 
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate      # Mac or Linux
-   .venv\Scripts\activate         # Windows
+### 2. Create a Virtual Environment
 
-2. Install dependencies
+```bash
+python -m venv .venv
+```
+
+Activate it on macOS or Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+Activate it on Windows:
+
+```bash
+.venv\Scripts\activate
+```
+
+### 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Run the app:
+### 4. Run the Application
 
 ```bash
 python -m src.main
 ```
 
-### Running Tests
+---
 
-Run the starter tests with:
+## Running Tests
+
+Run the test suite with:
 
 ```bash
 pytest
 ```
 
-You can add more tests in `tests/test_recommender.py`.
+The tests are located in:
+
+```text
+tests/test_recommender.py
+```
 
 ---
 
 ## Sample Recommendation Output
 
-Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
+```text
+Top recommendations:
 
-```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
+Sunrise City — Score: 0.96
+Because: Recommended because 'pop' is a favorite genre; mood 'happy'
+matches your taste; energy level is close to your target; positivity is
+close to your target; tempo is close to your target; danceability is
+close to your target; acousticness is close to your target.
+
+Shape of You — Score: 0.91
+Because: Recommended because 'pop' is a favorite genre; mood 'happy'
+matches your taste; positivity is close to your target; danceability is
+close to your target.
+
+Happy — Score: 0.89
+Because: Recommended because 'pop' is a favorite genre; mood 'happy'
+matches your taste; energy level is close to your target; acousticness
+is close to your target.
 ```
 
-**Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
+### Demo
+
+Add a screenshot or video of the running project here.
+
+```markdown
+![Music recommender output](images/recommender-output.png)
+```
 
 ---
 
-## Experiments You Tried
+## Experiments
 
-Use this section to document the experiments you ran. For example:
+### Experiment 1: Increasing the Genre Weight
 
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+I increased the genre weight to make exact genre matches more important.
+
+This caused the system to recommend more songs from the user's favorite genres. However, it also reduced the variety of the recommendations because songs from other genres received lower scores even when their mood and numerical features were similar.
+
+### Experiment 2: Adding Mood
+
+Adding mood improved the recommendations because songs could match the emotional experience the user wanted.
+
+For example, a happy song from a related genre could rank higher than an exact genre match with a very different mood.
+
+### Experiment 3: Adding Numerical Features
+
+Energy, tempo, valence, danceability, and acousticness helped the system distinguish between songs within the same genre.
+
+For example, the system could separate energetic pop songs from calm or acoustic pop songs.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
+This system has several limitations:
 
-Examples:
+- The dataset contains a small number of songs.
+- Song features were manually labeled and may be subjective.
+- Mood and genre do not always have one correct label.
+- The system may over-prioritize genre and ignore songs from unfamiliar genres.
+- A single user profile cannot represent every listening situation.
+- A user may prefer different music while studying, exercising, relaxing, or attending a party.
+- The system does not analyze song lyrics.
+- The system does not learn from skips, likes, repeated plays, or listening history.
+- Songs with missing or inaccurate feature values may receive unfair scores.
+- The recommender may repeatedly suggest similar songs and reduce musical variety.
 
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+Because this is a content-based system, the quality of the recommendations depends heavily on the quality of the dataset and the selected feature weights.
 
 ---
 
 ## Reflection
 
-Read and complete `model_card.md`:
+This project helped me understand how a recommendation system converts information into a prediction. Each song is represented by features, and the user is represented by a taste profile. The system compares the two, calculates a score, and ranks the songs. I learned that changing a feature weight can significantly change the recommendations.
+
+I also learned that bias can appear through manually selected labels and scoring rules. For example, giving genre too much weight may prevent the user from discovering songs from different genres that still match their preferred mood, energy, or danceability. A more advanced system could improve over time by learning from user likes, skips, ratings, and listening behavior.
+
+For more details, see the project model card:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+---
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+## Future Improvements
 
+Future versions of the project could:
 
+- Allow the user to enter preferences through an interface.
+- Learn from likes and dislikes.
+- Create separate profiles for studying, exercising, and relaxing.
+- Recommend songs from related genres.
+- Prevent repeated recommendations.
+- Use a larger and more diverse song dataset.
+- Add a web interface using Flask or Streamlit.
+- Connect to a music API for real song information.
 
+---
+
+## Technologies Used
+
+- Python
+- CSV
+- Pytest
+- Visual Studio Code
+- Git and GitHub
